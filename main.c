@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "list.h"
 
-typedef struct 
+typedef struct
 {
     int puntosHabilidad;
     List *items;
@@ -50,10 +50,16 @@ void mostrarPerfilJugador(Map *jugadores)
     if (searchMap(jugadores, nombre) != NULL)
     {
         Datos *datos = (Datos *)searchMap(jugadores, nombre);
+        List *lista = datos->items;
         printf("Nombre: %s\n", nombre);
         printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
         printf("Items: ");
-        printf("%s",datos->items);
+        struct Node *aux = lista->head;
+        while(aux != NULL)
+        {
+            printf("%s ", (char *)aux->data);
+            aux = aux->next;
+        }
         printf("\n");
     }
     else
@@ -62,6 +68,26 @@ void mostrarPerfilJugador(Map *jugadores)
     }
 }
 
+void agregarItemJugador(Map *jugadores)
+{
+    char nombre[20];
+    char item[20];
+    printf("Ingrese el nombre del jugador: ");
+    scanf("%s", nombre);
+    if (searchMap(jugadores, nombre) != NULL)
+    {
+        printf("Ingrese el nombre del item: ");
+        scanf("%s", item);
+        Datos *datos = searchMap(jugadores, nombre);
+        pushBack(datos->items, item);
+        datos->cantItems++;
+        printf("Item agregado con exito\n");
+    }
+    else
+    {
+        printf("El jugador no existe\n");
+    }
+}
 
 int main()
 {
