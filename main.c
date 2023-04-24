@@ -21,6 +21,26 @@ int is_equal_string(void *key1, void *key2)
     return 0;
 }
 
+void crearPerfilJugador(Map *jugadores)
+{
+    char nombre[20];
+    printf("Ingrese el nombre del jugador: ");
+    scanf("%s", nombre);
+    if (searchMap(jugadores, nombre) == NULL)
+    {
+        Datos *datos = (Datos *)malloc(sizeof(Datos));
+        datos->puntosHabilidad = 0;
+        datos->items = createList();
+        datos->funcionesAnteriores = stack_create();
+        insertMap(jugadores, nombre, datos);
+        printf("Perfil de jugador creado con exito\n");
+    }
+    else
+    {
+        printf("El jugador ya existe\n");
+    }
+}
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -43,6 +63,7 @@ int main()
         switch (opcion)
         {
             case 1:
+                crearPerfilJugador(jugadores);
                 break;
             case 2:
                 break;
