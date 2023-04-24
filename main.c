@@ -9,6 +9,7 @@ typedef struct
 {
     int puntosHabilidad;
     List *items;
+    int cantItems;
     Stack *funcionesAnteriores;
 }Datos;
 
@@ -41,6 +42,27 @@ void crearPerfilJugador(Map *jugadores)
     }
 }
 
+void mostrarPerfilJugador(Map *jugadores)
+{
+    char nombre[20];
+    printf("Ingrese el nombre del jugador: ");
+    scanf("%s", nombre);
+    if (searchMap(jugadores, nombre) != NULL)
+    {
+        Datos *datos = (Datos *)searchMap(jugadores, nombre);
+        printf("Nombre: %s\n", nombre);
+        printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
+        printf("Items: ");
+        printf("%s",datos->items);
+        printf("\n");
+    }
+    else
+    {
+        printf("El jugador no existe\n");
+    }
+}
+
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -66,6 +88,7 @@ int main()
                 crearPerfilJugador(jugadores);
                 break;
             case 2:
+                mostrarPerfilJugador(jugadores);
                 break;
             case 3:
                 break;
