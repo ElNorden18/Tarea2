@@ -89,6 +89,50 @@ void agregarItemJugador(Map *jugadores)
     }
 }
 
+void eliminarItem(Map *jugadores)
+{
+    char nombre[20];
+    printf("Ingrese el nombre del jugador: ");
+    scanf("%s", nombre);
+    if (searchMap(jugadores, nombre) != NULL)
+    {
+        Datos *datos = searchMap(jugadores, nombre);
+        if (firstList(datos->items) != NULL)
+        {
+            char item[20];
+            printf("Ingrese el nombre del item a eliminar: ");
+            scanf("%s", item);
+            if (firstList(datos->items) != NULL)
+            {
+                while (nextList(datos->items) != NULL)
+                {
+                    if (strcmp((char *)firstList(datos->items), item) == 0)
+                    {
+                        pop(datos->items);
+                        printf("Item eliminado con exito\n");
+                        return;
+                    }
+                }
+                if (strcmp((char *)firstList(datos->items), item) == 0)
+                {
+                    pop(datos->items);
+                    printf("Item eliminado con exito\n");
+                    return;
+                }
+            }
+            printf("El item no existe\n");
+        }
+        else
+        {
+            printf("El jugador no tiene items\n");
+        }
+    }
+    else
+    {
+        printf("El jugador no existe\n");
+    }
+}
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
