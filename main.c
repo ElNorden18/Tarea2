@@ -7,8 +7,9 @@
 
 typedef struct
 {
+    char nombre[20];
     int puntosHabilidad;
-    List *items;
+    Map *items;
     int cantItems;
     Stack *funcionesAnteriores;
 }Datos;
@@ -22,73 +23,65 @@ int is_equal_string(void *key1, void *key2)
     return 0;
 }
 
-void crearPerfilJugador(Map *jugadores)
+Datos *crearPerfilJugador()
 {
     char nombre[20];
+    Datos *datos = (Datos *)malloc(sizeof(Datos));
     printf("Ingrese el nombre del jugador: ");
     scanf("%s", nombre);
-    if (searchMap(jugadores, nombre) == NULL)
-    {
-        Datos *datos = (Datos *)malloc(sizeof(Datos));
-        datos->puntosHabilidad = 0;
-        datos->items = createList();
-        datos->funcionesAnteriores = stack_create();
-        insertMap(jugadores, nombre, datos);
-        printf("Perfil de jugador creado con exito\n");
-    }
-    else
-    {
-        printf("El jugador ya existe\n");
-    }
+    strcpy(datos->nombre, nombre);
+    datos->puntosHabilidad = 0;
+    datos->items = createMap(is_equal_string);
+    datos->cantItems = 0;
+    datos->funcionesAnteriores = stack_create();
+    printf("Perfil creado con exito\n");
+    return datos;
 }
 
-void mostrarPerfilJugador(Map *jugadores)
+void mostrarPerfilJugador(Map *jugadores, char *nombre)
 {
-    char nombre[20];
-    printf("Ingrese el nombre del jugador: ");
-    scanf("%s", nombre);
-    if (searchMap(jugadores, nombre) != NULL)
+    Datos *datos = searchMap(jugadores, nombre);
+    if(datos == NULL)
     {
-        Datos *datos = (Datos *)searchMap(jugadores, nombre);
-        List *lista = datos->items;
-        printf("Nombre: %s\n", nombre);
-        printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
-        printf("Items: ");
-        struct Node *aux = lista->head;
-        while(aux != NULL)
+        printf("El jugador no existe\n");
+        return;
+    }
+    printf("Nombre: %s\n", datos->nombre);
+    printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
+    printf("Items: ");
+    if(firstMap(datos->items) != NULL)
+    {
+        while(nextMap(datos->items) != NULL)
         {
-            printf("%s ", (char *)aux->data);
-            aux = aux->next;
+            printf("%s, ", (char *)firstMap(datos->items));
         }
-        printf("\n");
+        printf("%s\n", (char *)firstMap(datos->items));
     }
     else
     {
-        printf("El jugador no existe\n");
+        printf("No tiene items\n");
     }
 }
 
-void agregarItemJugador(Map *jugadores)
+void agregarItem(Map *jugadores, char *nombre)
 {
-    char nombre[20];
-    char item[20];
-    printf("Ingrese el nombre del jugador: ");
-    scanf("%s", nombre);
-    if (searchMap(jugadores, nombre) != NULL)
-    {
-        printf("Ingrese el nombre del item: ");
-        scanf("%s", item);
-        Datos *datos = searchMap(jugadores, nombre);
-        pushBack(datos->items, item);
-        datos->cantItems++;
-        printf("Item agregado con exito\n");
-    }
-    else
+    Datos *datos = searchMap(jugadores, nombre);
+    if(datos == NULL)
     {
         printf("El jugador no existe\n");
+        return;
     }
+    printf("Ingrese el nombre del item: ");
+    char item[20];
+    scanf("%s", item);
+    if(searchMap(datos->items, item) != NULL)
+    {
+        printf("El item ya existe\n");
+        return;
+    }
+    insertMap(datos->items, item, item);
 }
-
+/*
 void eliminarItem(Map *jugadores)
 {
     char nombre[20];
@@ -108,14 +101,14 @@ void eliminarItem(Map *jugadores)
                 {
                     if (strcmp((char *)firstList(datos->items), item) == 0)
                     {
-                        pop(datos->items);
+                        popCurrent(datos->items);
                         printf("Item eliminado con exito\n");
                         return;
                     }
                 }
                 if (strcmp((char *)firstList(datos->items), item) == 0)
                 {
-                    pop(datos->items);
+                    popCurrent(datos->items);
                     printf("Item eliminado con exito\n");
                     return;
                 }
@@ -131,11 +124,13 @@ void eliminarItem(Map *jugadores)
     {
         printf("El jugador no existe\n");
     }
-}
+} */
 
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
+    Datos *jugador;
+    char nombre[20];
     int opcion = 1;
     while(opcion != 0)
     {
@@ -155,12 +150,18 @@ int main()
         switch (opcion)
         {
             case 1:
-                crearPerfilJugador(jugadores);
+                jugador = crearPerfilJugador();
+                insertMap(jugadores, jugador->nombre, jugador);
                 break;
             case 2:
-                mostrarPerfilJugador(jugadores);
+                printf("Ingrese el nombre del jugador: ");
+                scanf("%s", nombre);
+                mostrarPerfilJugador(jugadores, nombre);
                 break;
             case 3:
+                printf("Ingrese el nombre del jugador: ");
+                scanf("%s", nombre);
+                agregarItem(jugadores, nombre);
                 break;
             case 4:
                 break;
