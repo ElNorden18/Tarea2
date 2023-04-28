@@ -131,11 +131,14 @@ void SumarPuntosHabilidad(Map *jugadores, char *nombre)
     Datos *datos = searchMap(jugadores, nombre);
     if(datos == NULL)
     {
+        printf("El jugador buscado no existe\n");
         return;
     }
     int puntos;
+    printf("Ingrese la cantidad de puntos de habilidad que desea agregar:");
     scanf("%d", &puntos);
     datos->puntosHabilidad += puntos;
+    printf("Puntos de habilidad agregados con exito\n");
     
 }
 
