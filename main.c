@@ -126,6 +126,19 @@ void eliminarItem(Map *jugadores)
     }
 } */
 
+void SumarPuntosHabilidad(Map *jugadores, char *nombre)
+{
+    Datos *datos = searchMap(jugadores, nombre);
+    if(datos == NULL)
+    {
+        return;
+    }
+    int puntos;
+    scanf("%d", &puntos);
+    datos->puntosHabilidad += puntos;
+    
+}
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -166,6 +179,9 @@ int main()
             case 4:
                 break;
             case 5:
+                printf("Ingrese el nombre del jugador: ");
+                scanf("%s", nombre);
+                SumarPuntosHabilidad(jugadores, nombre);
                 break;
             case 6: 
                 break;
