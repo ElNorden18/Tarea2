@@ -142,6 +142,31 @@ void SumarPuntosHabilidad(Map *jugadores, char *nombre)
     
 }
 
+void MostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
+{
+    if(firstMap(jugadores) != NULL)
+    {
+        while(nextMap(jugadores) != NULL)
+        {
+            Datos *datos = firstMap(jugadores);
+            if(searchMap(datos->items, item) != NULL)
+            {
+                printf("Jugadores con el item especifico: \n");
+                printf("%s\n", datos->nombre);
+            }
+        }
+        Datos *datos = firstMap(jugadores);
+        if(searchMap(datos->items, item) != NULL)
+        {
+            printf("%s\n", datos->nombre);
+        }
+    }
+    else
+    {
+        printf("No hay jugadores\n");
+    }
+}
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -187,6 +212,9 @@ int main()
                 SumarPuntosHabilidad(jugadores, nombre);
                 break;
             case 6: 
+                printf("Ingrese el nombre del item: ");
+                scanf("%s", nombre);
+                MostrarJugadoresConItemsEspecifico(jugadores, nombre);
                 break;
             case 7:
                 break;
