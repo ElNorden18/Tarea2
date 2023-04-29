@@ -14,6 +14,39 @@ typedef struct
     Stack *funcionesAnteriores;
 }Datos;
 
+const char *get_csv_field (char * tmp, int k) {
+    int open_mark = 0;
+    char* ret=(char*) malloc (100*sizeof(char));
+    int ini_i=0, i=0;
+    int j=0;
+    while(tmp[i+1]!='\0'){
+        if(tmp[i]== '\"'){
+            open_mark = 1-open_mark;
+            if(open_mark) ini_i = i+1;
+            i++;
+            continue;
+        }
+        if(open_mark || tmp[i]!= ','){
+            if(k==j) ret[i-ini_i] = tmp[i];
+            i++;
+            continue;
+        }
+        if(tmp[i]== ','){
+            if(k==j) {
+               ret[i-ini_i] = 0;
+               return ret;
+            }
+            j++; ini_i = i+1;
+        }
+        i++;
+    }
+    if(k==j) {
+       ret[i-ini_i] = 0;
+       return ret;
+    }
+    return NULL;
+}
+
 int is_equal_string(void *key1, void *key2)
 {
     if (strcmp((char *)key1, (char *)key2) == 0)
@@ -172,6 +205,26 @@ void deshacerAccion(Map *jugadores, char *nombre){
     stack_pop(datos->funcionesAnteriores);
     datos=stack_top(datos->funcionesAnteriores);
 }
+
+importarDatosJugadoresCsv()
+{
+    char nombreArchivo[30];
+    int cantJugadores;
+    printf("Ingrese el nombre del archivo .csv: ");
+    scanf("%s", nombreArchivo);
+    printf("\n");
+    strcat(nombreArchivo, ".csv");
+    FILE *fp = fopen(nombreArchivo, "r");
+
+    if (fp == NULL)
+    {
+        printf("No se pudo abrir el archivo\n");
+        return;
+    }
+
+
+}
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -226,6 +279,7 @@ int main()
             case 8:
                 break;
             case 9:
+                ImportarDatosJugadores();
                 break;
             case 0:
                 printf("Saliendo del programa...\n");
