@@ -203,25 +203,45 @@ void deshacerAccion(Map *jugadores, char *nombre){
     datos=stack_top(datos->funcionesAnteriores);
 }
 
-importarDatosJugadoresCsv()
+void importarPacientes(Map *Jugadores)
 {
-    char nombreArchivo[30];
-    int cantJugadores;
-    printf("Ingrese el nombre del archivo .csv: ");
-    scanf("%s", nombreArchivo);
-    printf("\n");
-    strcat(nombreArchivo, ".csv");
-    FILE *fp = fopen(nombreArchivo, "r");
+    char archivo[30];
+    printf("Ingrese el nombre del archivo: ");
+    scanf("%s", archivo);
+    strcat(archivo, ".csv");
+    printf("\n")
+    FILE *fp = fopen(archivo, "r");
 
-    if (fp == NULL)
+    char linea[1024];
+
+    while (fgets(linea, 1023, fp) != NULL)
     {
-        printf("No se pudo abrir el archivo\n");
-        return;
+        Datos *nuevoJugador = (Datos*) malloc(sizeof(Datos));
+        for (int i = 0; i < 3 ; i++) 
+        {
+            char *aux = get_csv_field(linea, i);
+            switch (i) 
+            {
+                case 0:
+                    strcpy(nuevoJugador->nombre, aux);
+                    break;
+                case 1:
+                    strcpy(nuevoJugador->puntosHabilidad, aux);
+                    break;
+               case 2:
+                    nuevoJugador->cantItems = atoi(aux);
+                    break;
+                case 3;
+                    strcpy(nuevoJugador->items, aux);
+                    break; 
+                
+            }
+
+        }
+        pushBack(Jugadores, nuevoJugador);
     }
-
-
+    fclose(fp);
 }
-
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -282,7 +302,7 @@ int main()
             case 8:
                 break;
             case 9:
-                ImportarDatosJugadores();
+                ImportarDatosJugadores(jugadores);
                 break;
             case 0:
                 printf("Saliendo del programa...\n");
