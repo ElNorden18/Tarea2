@@ -46,6 +46,7 @@ void mostrarPerfilJugador(Map *jugadores, char *nombre)
         printf("El jugador no existe\n");
         return;
     }
+    
     printf("Nombre: %s\n", datos->nombre);
     printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
     printf("Items: ");
@@ -80,8 +81,9 @@ void agregarItem(Map *jugadores, char *nombre)
         return;
     }
     insertMap(datos->items, item, item);
+    stack_push(datos->funcionesAnteriores, datos);
 }
-/*
+
 void eliminarItem(Map *jugadores)
 {
     char nombre[20];
@@ -124,7 +126,7 @@ void eliminarItem(Map *jugadores)
     {
         printf("El jugador no existe\n");
     }
-} */
+} 
 
 void SumarPuntosHabilidad(Map *jugadores, char *nombre)
 {
@@ -138,6 +140,7 @@ void SumarPuntosHabilidad(Map *jugadores, char *nombre)
     printf("Ingrese la cantidad de puntos de habilidad que desea agregar:");
     scanf("%d", &puntos);
     datos->puntosHabilidad += puntos;
+    stack_push(datos->funcionesAnteriores, datos);
     printf("Puntos de habilidad agregados con exito\n");
     
 }
@@ -166,7 +169,16 @@ void MostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
         printf("No hay jugadores\n");
     }
 }
-
+void deshacerAccion(Map *jugadores, char *nombre){
+    Datos *datos = searchMap(jugadores, nombre);
+    if(datos == NULL)
+    {
+        printf("El jugador no existe\n");
+        return;
+    }
+    stack_pop(datos->funcionesAnteriores);
+    datos=stack_top(datos->funcionesAnteriores);
+}
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
