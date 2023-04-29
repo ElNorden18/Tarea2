@@ -50,18 +50,20 @@ void mostrarPerfilJugador(Map *jugadores, char *nombre)
     printf("Nombre: %s\n", datos->nombre);
     printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
     printf("Items: ");
-    if(firstMap(datos->items) != NULL)
+    char *item = firstMap(datos->items);
+    if(item != NULL)
     {
-        while(nextMap(datos->items) != NULL)
+        printf("%s, ", item);
+        while((item = nextMap(datos->items)) != NULL)
         {
-            printf("%s, ", (char *)firstMap(datos->items));
+            printf("%s ", item);
         }
-        printf("%s\n", (char *)firstMap(datos->items));
     }
     else
     {
-        printf("No tiene items\n");
+        printf("El jugador no tiene items\n");
     }
+    printf("\n");
 }
 
 void agregarItem(Map *jugadores, char *nombre)
@@ -73,7 +75,7 @@ void agregarItem(Map *jugadores, char *nombre)
         return;
     }
     printf("Ingrese el nombre del item: ");
-    char item[20];
+    char *item = malloc(sizeof(char)*20);
     scanf("%s", item);
     if(searchMap(datos->items, item) != NULL)
     {
@@ -84,42 +86,40 @@ void agregarItem(Map *jugadores, char *nombre)
     stack_push(datos->funcionesAnteriores, datos);
 }
 
-void eliminarItem(Map *jugadores)
+void eliminarItem(Map *jugadores, char *nombre)
 {
-    char nombre[20];
-    printf("Ingrese el nombre del jugador: ");
-    scanf("%s", nombre);
-    if (searchMap(jugadores, nombre) != NULL)
+    Datos *datos = searchMap(jugadores, nombre);
+    if (datos == NULL)
     {
-        Datos *datos = searchMap(jugadores, nombre);
-        if (firstList(datos->items) != NULL)
+        printf("El jugador no existe\n");
+        return;
+    }
+    
+    if (firstMap(datos->items) != NULL)
+    {
+        char item[20];
+        printf("Ingrese el nombre del item a eliminar: ");
+        scanf("%s", item);
+
+        if (searchMap(datos->items, item) != NULL)
         {
-            char item[20];
-            printf("Ingrese el nombre del item a eliminar: ");
-            scanf("%s", item);
-            if (firstList(datos->items) != NULL)
-            {
-                for(firstList(datos->items);nextList(datos->items)!=NULL;nextList(datos->items))
-                {
-                    if(strcmp(item,(char *)datos->items)){
-                        popCurrent(datos->items);
-                        printf("El item ha sido eliminado\n");
-                        break;
-                    }
-                }
-            }
-            printf("El item no existe\n");
+            stack_push(datos->funcionesAnteriores, datos);
+            eraseMap(datos->items, item);
+            printf("Item eliminado con exito\n");
         }
         else
         {
-            printf("El jugador no tiene items\n");
+            printf("El item no existe\n");
         }
+
+
+        printf("El item no existe\n");
     }
     else
     {
-        printf("El jugador no existe\n");
+        printf("El jugador no tiene items\n");
     }
-} 
+}
 
 void SumarPuntosHabilidad(Map *jugadores, char *nombre)
 {
@@ -142,20 +142,17 @@ void MostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
 {
     if(firstMap(jugadores) != NULL)
     {
-        while(nextMap(jugadores) != NULL)
+        char *nombre = firstMap(jugadores);
+        while(nombre != NULL)
         {
-            Datos *datos = firstMap(jugadores);
+            Datos *datos = searchMap(jugadores, nombre);
             if(searchMap(datos->items, item) != NULL)
             {
-                printf("Jugadores con el item especifico: \n");
-                printf("%s\n", datos->nombre);
+                printf("%s, ", nombre);
             }
+            nombre = nextMap(jugadores);
         }
-        Datos *datos = firstMap(jugadores);
-        if(searchMap(datos->items, item) != NULL)
-        {
-            printf("%s\n", datos->nombre);
-        }
+        printf("\n");
     }
     else
     {
@@ -210,6 +207,9 @@ int main()
                 agregarItem(jugadores, nombre);
                 break;
             case 4:
+                printf("Ingrese el nombre del jugador: ");
+                scanf("%s", nombre);
+                eliminarItem(jugadores, nombre);
                 break;
             case 5:
                 printf("Ingrese el nombre del jugador: ");
@@ -222,6 +222,9 @@ int main()
                 MostrarJugadoresConItemsEspecifico(jugadores, nombre);
                 break;
             case 7:
+                printf("Ingrese el nombre del jugador: ");
+                scanf("%s", nombre);
+                deshacerAccion(jugadores, nombre);
                 break;
             case 8:
                 break;
