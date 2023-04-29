@@ -99,20 +99,13 @@ void eliminarItem(Map *jugadores)
             scanf("%s", item);
             if (firstList(datos->items) != NULL)
             {
-                while (nextList(datos->items) != NULL)
+                for(firstList(datos->items);nextList(datos->items)!=NULL;nextList(datos->items))
                 {
-                    if (strcmp((char *)firstList(datos->items), item) == 0)
-                    {
+                    if(strcmp(item,(char *)datos->items)){
                         popCurrent(datos->items);
-                        printf("Item eliminado con exito\n");
-                        return;
+                        printf("El item ha sido eliminado\n");
+                        break;
                     }
-                }
-                if (strcmp((char *)firstList(datos->items), item) == 0)
-                {
-                    popCurrent(datos->items);
-                    printf("Item eliminado con exito\n");
-                    return;
                 }
             }
             printf("El item no existe\n");
