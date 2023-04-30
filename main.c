@@ -204,8 +204,8 @@ void deshacerAccion(Map *jugadores, char *nombre)
         printf("El jugador no existe\n");
         return;
     }
-    stack_pop(datos->funcionesAnteriores);
-    Datos *datosAnteriores = stack_top(datos->funcionesAnteriores);
+    dstack_pop(datos->funcionesAnteriores);
+    
     if(datosAnteriores == NULL)
     {
         printf("No hay acciones para deshacer\n");
