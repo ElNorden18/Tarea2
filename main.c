@@ -57,6 +57,18 @@ int is_equal_string(void *key1, void *key2)
     return 0;
 }
 
+Datos *crearCopia(Datos *Original)
+{
+    Datos *datos = (Datos *)malloc(sizeof(Datos));
+
+    strcpy(datos->nombre, Original->nombre);
+    datos->puntosHabilidad = Original->puntosHabilidad;
+    datos->items = createMap(is_equal_string);
+    datos->cantItems = Original->cantItems;
+    datos->items = Original->items;
+    return datos;
+}
+
 Datos *crearPerfilJugador()
 {
     char nombre[20];
@@ -68,6 +80,8 @@ Datos *crearPerfilJugador()
     datos->items = createMap(is_equal_string);
     datos->cantItems = 0;
     datos->funcionesAnteriores = stack_create();
+    Datos *copia = crearCopia(datos);
+    stack_push(datos->funcionesAnteriores, copia);
     printf("Perfil creado con exito\n");
     return datos;
 }
@@ -117,7 +131,8 @@ void agregarItem(Map *jugadores, char *nombre)
         printf("El item ya existe\n");
         return;
     }
-    stack_push(datos->funcionesAnteriores, datos);
+    Datos *copia = crearCopia(datos);
+    stack_push(datos->funcionesAnteriores, copia);
     insertMap(datos->items, item, item);
     datos->cantItems++;
 }
@@ -139,7 +154,8 @@ void eliminarItem(Map *jugadores, char *nombre)
 
         if (searchMap(datos->items, item) != NULL)
         {
-            stack_push(datos->funcionesAnteriores, datos);
+            Datos *copia = crearCopia(datos);
+            stack_push(datos->funcionesAnteriores, copia);
             eraseMap(datos->items, item);
             datos->cantItems--;
             printf("Item eliminado con exito\n");
@@ -158,7 +174,7 @@ void eliminarItem(Map *jugadores, char *nombre)
     }
 }
 
-void SumarPuntosHabilidad(Map *jugadores, char *nombre)
+void sumarPuntosHabilidad(Map *jugadores, char *nombre)
 {
     Datos *datos = searchMap(jugadores, nombre);
     if(datos == NULL)
@@ -166,16 +182,17 @@ void SumarPuntosHabilidad(Map *jugadores, char *nombre)
         printf("El jugador buscado no existe\n");
         return;
     }
-    stack_push(datos->funcionesAnteriores, datos);
+    Datos *copia = crearCopia(datos);
+    stack_push(datos->funcionesAnteriores, copia);
     int puntos;
-    printf("Ingrese la cantidad de puntos de habilidad que desea agregar:");
+    printf("Ingrese la cantidad de puntos de habilidad que desea agregar: ");
     scanf("%d", &puntos);
     datos->puntosHabilidad += puntos;
     printf("Puntos de habilidad agregados con exito\n");
     
 }
 
-void MostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
+void mostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
 {
     if(firstMap(jugadores) != NULL)
     {
@@ -204,7 +221,7 @@ void deshacerAccion(Map *jugadores, char *nombre)
         printf("El jugador no existe\n");
         return;
     }
-    dstack_pop(datos->funcionesAnteriores);
+    Datos *datosAnteriores = stack_pop(datos->funcionesAnteriores);
     
     if(datosAnteriores == NULL)
     {
@@ -245,8 +262,9 @@ void importarJugadores(Map *Jugadores)
     }
     fclose(fp);
 }
-void exportarDatosJugadores(Map jugadores ){
-    Datosjugador = firstMap(jugadores);
+void exportarDatosJugadores(Map *jugadores )
+{
+    Datos *jugador = firstMap(jugadores);
     char archivo[30];
     printf("Ingrese el nombre del archivo .csv: ");
     scanf("%s", archivo);
@@ -262,42 +280,19 @@ void exportarDatosJugadores(Map jugadores ){
         char stringCantItems[10];
         sprintf(stringCantItems, "%d", jugador->cantItems);
         fputs(stringCantItems, fp);
-        for ( int i = 0; i < jugador->cantItems; i++)
+        char *aux = firstMap(jugador->items);
+        while(aux != NULL)
         {
             fputs("," , fp);
-            fputs(jugador->items[i], fp);
+            fputs(aux, fp);
+            aux = nextMap(jugador->items);
         }
-        jugador = nextmap(jugadores);
-        fprintf("\n",fp);
+        jugador = nextMap(jugadores);
+        fputs("\n",fp);
     }
+    printf("Datos exportados con exito\n");
+    fclose(fp);
 }
-void exportarDatosJugadores(Map jugadores ){
-    Datosjugador = firstMap(jugadores);
-    char archivo[30];
-    printf("Ingrese el nombre del archivo .csv: ");
-    scanf("%s", archivo);
-    strcat(archivo, ".csv");
-    FILE *fp = fopen(archivo,"a");
-    while(jugador != NULL){
-        fputs(jugador->nombre, fp);
-        fputs("," , fp);
-        char Puntos[10];
-        sprintf(Puntos, "%d", jugador->puntosHabilidad);
-        fputs(Puntos, fp);
-        fputs("," , fp);
-        char stringCantItems[10];
-        sprintf(stringCantItems, "%d", jugador->cantItems);
-        fputs(stringCantItems, fp);
-        for ( int i = 0; i < jugador->cantItems; i++)
-        {
-            fputs("," , fp);
-            fputs(jugador->items[i], fp);
-        }
-        jugador = nextmap(jugadores);
-        fprintf("\n",fp);
-    }
-}
-
 
 int main()
 {
@@ -344,12 +339,12 @@ int main()
             case 5:
                 printf("Ingrese el nombre del jugador: ");
                 scanf("%s", nombre);
-                SumarPuntosHabilidad(jugadores, nombre);
+                sumarPuntosHabilidad(jugadores, nombre);
                 break;
             case 6: 
                 printf("Ingrese el nombre del item: ");
                 scanf("%s", nombre);
-                MostrarJugadoresConItemsEspecifico(jugadores, nombre);
+                mostrarJugadoresConItemsEspecifico(jugadores, nombre);
                 break;
             case 7:
                 printf("Ingrese el nombre del jugador: ");
@@ -357,6 +352,7 @@ int main()
                 deshacerAccion(jugadores, nombre);
                 break;
             case 8:
+                exportarDatosJugadores(jugadores);
                 break;
             case 9:
                 importarJugadores(jugadores);
