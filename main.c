@@ -38,6 +38,7 @@ const char *get_csv_field (char * tmp, int k) {
             }
             j++; ini_i = i+1;
         }
+
         i++;
     }
     if(k==j) {
@@ -82,6 +83,7 @@ void mostrarPerfilJugador(Map *jugadores, char *nombre)
     
     printf("Nombre: %s\n", datos->nombre);
     printf("Puntos de habilidad: %d\n", datos->puntosHabilidad);
+    printf("Cantidad de items: %d\n", datos->cantItems);
     printf("Items: ");
     char *item = firstMap(datos->items);
     if(item != NULL)
@@ -115,8 +117,9 @@ void agregarItem(Map *jugadores, char *nombre)
         printf("El item ya existe\n");
         return;
     }
-    insertMap(datos->items, item, item);
     stack_push(datos->funcionesAnteriores, datos);
+    insertMap(datos->items, item, item);
+    datos->cantItems++;
 }
 
 void eliminarItem(Map *jugadores, char *nombre)
@@ -138,6 +141,7 @@ void eliminarItem(Map *jugadores, char *nombre)
         {
             stack_push(datos->funcionesAnteriores, datos);
             eraseMap(datos->items, item);
+            datos->cantItems--;
             printf("Item eliminado con exito\n");
         }
         else
@@ -162,11 +166,11 @@ void SumarPuntosHabilidad(Map *jugadores, char *nombre)
         printf("El jugador buscado no existe\n");
         return;
     }
+    stack_push(datos->funcionesAnteriores, datos);
     int puntos;
     printf("Ingrese la cantidad de puntos de habilidad que desea agregar:");
     scanf("%d", &puntos);
     datos->puntosHabilidad += puntos;
-    stack_push(datos->funcionesAnteriores, datos);
     printf("Puntos de habilidad agregados con exito\n");
     
 }
@@ -192,7 +196,8 @@ void MostrarJugadoresConItemsEspecifico(Map *jugadores, char *item)
         printf("No hay jugadores\n");
     }
 }
-void deshacerAccion(Map *jugadores, char *nombre){
+void deshacerAccion(Map *jugadores, char *nombre)
+{
     Datos *datos = searchMap(jugadores, nombre);
     if(datos == NULL)
     {
@@ -200,48 +205,48 @@ void deshacerAccion(Map *jugadores, char *nombre){
         return;
     }
     stack_pop(datos->funcionesAnteriores);
-    datos=stack_top(datos->funcionesAnteriores);
+    Datos *datosAnteriores = stack_top(datos->funcionesAnteriores);
+    if(datosAnteriores == NULL)
+    {
+        printf("No hay acciones para deshacer\n");
+        return;
+    }
+    datos->puntosHabilidad = datosAnteriores->puntosHabilidad;
+    datos->cantItems = datosAnteriores->cantItems;
+    datos->items = datosAnteriores->items;
+    printf("Accion deshecha con exito\n");
 }
 
-void importarPacientes(Map *Jugadores)
+void importarJugadores(Map *Jugadores)
 {
     char archivo[30];
     printf("Ingrese el nombre del archivo: ");
     scanf("%s", archivo);
     strcat(archivo, ".csv");
-    printf("\n")
+    printf("\n");
     FILE *fp = fopen(archivo, "r");
-
     char linea[1024];
-
     while (fgets(linea, 1023, fp) != NULL)
     {
         Datos *nuevoJugador = (Datos*) malloc(sizeof(Datos));
-        for (int i = 0; i < 3 ; i++) 
+        const char *aux = get_csv_field(linea, 0);
+        strcpy(nuevoJugador->nombre, aux);
+        aux = get_csv_field(linea, 1);
+        nuevoJugador->puntosHabilidad = atoi(aux);
+        aux = get_csv_field(linea, 2);
+        nuevoJugador->cantItems = atoi(aux);
+        nuevoJugador->items = createMap(is_equal_string);
+        for(int i = 0; i < nuevoJugador->cantItems; i++)
         {
-            char *aux = get_csv_field(linea, i);
-            switch (i) 
-            {
-                case 0:
-                    strcpy(nuevoJugador->nombre, aux);
-                    break;
-                case 1:
-                    strcpy(nuevoJugador->puntosHabilidad, aux);
-                    break;
-               case 2:
-                    nuevoJugador->cantItems = atoi(aux);
-                    break;
-                case 3;
-                    strcpy(nuevoJugador->items, aux);
-                    break; 
-                
-            }
-
+            aux = get_csv_field(linea, i+3);
+            insertMap(nuevoJugador->items, (void *)aux, (void *)aux);
         }
-        pushBack(Jugadores, nuevoJugador);
+        insertMap(Jugadores, nuevoJugador->nombre, nuevoJugador);
     }
     fclose(fp);
 }
+
+
 int main()
 {
     Map *jugadores = createMap(is_equal_string);
@@ -302,7 +307,7 @@ int main()
             case 8:
                 break;
             case 9:
-                ImportarDatosJugadores(jugadores);
+                importarJugadores(jugadores);
                 break;
             case 0:
                 printf("Saliendo del programa...\n");
