@@ -245,6 +245,58 @@ void importarJugadores(Map *Jugadores)
     }
     fclose(fp);
 }
+void exportarDatosJugadores(Map jugadores ){
+    Datosjugador = firstMap(jugadores);
+    char archivo[30];
+    printf("Ingrese el nombre del archivo .csv: ");
+    scanf("%s", archivo);
+    strcat(archivo, ".csv");
+    FILE *fp = fopen(archivo,"a");
+    while(jugador != NULL){
+        fputs(jugador->nombre, fp);
+        fputs("," , fp);
+        char Puntos[10];
+        sprintf(Puntos, "%d", jugador->puntosHabilidad);
+        fputs(Puntos, fp);
+        fputs("," , fp);
+        char stringCantItems[10];
+        sprintf(stringCantItems, "%d", jugador->cantItems);
+        fputs(stringCantItems, fp);
+        for ( int i = 0; i < jugador->cantItems; i++)
+        {
+            fputs("," , fp);
+            fputs(jugador->items[i], fp);
+        }
+        jugador = nextmap(jugadores);
+        fprintf("\n",fp);
+    }
+}
+void exportarDatosJugadores(Map jugadores ){
+    Datosjugador = firstMap(jugadores);
+    char archivo[30];
+    printf("Ingrese el nombre del archivo .csv: ");
+    scanf("%s", archivo);
+    strcat(archivo, ".csv");
+    FILE *fp = fopen(archivo,"a");
+    while(jugador != NULL){
+        fputs(jugador->nombre, fp);
+        fputs("," , fp);
+        char Puntos[10];
+        sprintf(Puntos, "%d", jugador->puntosHabilidad);
+        fputs(Puntos, fp);
+        fputs("," , fp);
+        char stringCantItems[10];
+        sprintf(stringCantItems, "%d", jugador->cantItems);
+        fputs(stringCantItems, fp);
+        for ( int i = 0; i < jugador->cantItems; i++)
+        {
+            fputs("," , fp);
+            fputs(jugador->items[i], fp);
+        }
+        jugador = nextmap(jugadores);
+        fprintf("\n",fp);
+    }
+}
 
 
 int main()
